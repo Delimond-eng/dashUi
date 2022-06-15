@@ -75,12 +75,16 @@ class _DashBoardState extends State<DashBoard> {
                       Flexible(
                         flex: 5,
                         child: Container(
-                          margin: const EdgeInsets.all(8.0),
                           height: constraint.maxHeight,
                           width: constraint.maxWidth,
-                          color: Colors.white,
+                          padding: const EdgeInsets.all(20.0),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(5.0),
+                          ),
                           child: SfCartesianChart(
                             primaryXAxis: CategoryAxis(),
+
                             // Chart title
                             title:
                                 ChartTitle(text: 'Half yearly sales analysis'),
@@ -90,33 +94,43 @@ class _DashBoardState extends State<DashBoard> {
                             tooltipBehavior: TooltipBehavior(enable: true),
                             series: <ChartSeries<SalesData, String>>[
                               LineSeries<SalesData, String>(
-                                  dataSource: data,
-                                  xValueMapper: (SalesData sales, _) =>
-                                      sales.year,
-                                  yValueMapper: (SalesData sales, _) =>
-                                      sales.sales,
-                                  name: 'Sales',
-                                  // Enable data label
-                                  dataLabelSettings:
-                                      const DataLabelSettings(isVisible: true))
+                                dataSource: data,
+                                xValueMapper: (SalesData sales, _) =>
+                                    sales.year,
+                                yValueMapper: (SalesData sales, _) =>
+                                    sales.sales,
+                                name: 'Sales',
+                                // Enable data label
+                                dataLabelSettings:
+                                    DataLabelSettings(isVisible: true),
+                              )
                             ],
                           ),
                         ),
                       ),
+                      const SizedBox(
+                        width: 15,
+                      ),
                       Flexible(
                         flex: 5,
                         child: Container(
-                          margin: const EdgeInsets.all(8.0),
+                          padding: const EdgeInsets.all(20.0),
                           height: constraint.maxHeight,
                           width: constraint.maxWidth,
-                          color: Colors.white,
+                          margin: const EdgeInsets.only(right: 10.0),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(5.0),
+                          ),
                           child: SfSparkLineChart.custom(
                             //Enable the trackball
-                            trackball: const SparkChartTrackball(
-                                activationMode: SparkChartActivationMode.tap),
+                            trackball: SparkChartTrackball(
+                              activationMode: SparkChartActivationMode.tap,
+                            ),
                             //Enable marker
-                            marker: const SparkChartMarker(
-                                displayMode: SparkChartMarkerDisplayMode.all),
+                            marker: SparkChartMarker(
+                              displayMode: SparkChartMarkerDisplayMode.all,
+                            ),
                             //Enable data label
                             labelDisplayMode: SparkChartLabelDisplayMode.all,
                             xValueMapper: (int index) => data[index].year,

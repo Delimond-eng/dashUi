@@ -14,7 +14,6 @@ class DashCard extends StatelessWidget {
     return Container(
       height: 80.0,
       width: double.infinity,
-      margin: const EdgeInsets.only(right: 15.0),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(5.0),
         color: color.shade50,
@@ -53,26 +52,28 @@ class DashCard extends StatelessWidget {
             const SizedBox(
               width: 20.0,
             ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                      color: color.shade900, fontWeight: FontWeight.w800),
-                ),
-                const SizedBox(
-                  height: 5.0,
-                ),
-                Text(
-                  subtitle,
-                  style: TextStyle(
-                    color: Colors.grey[700],
-                    fontSize: 15.0,
+            Flexible(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                        color: color.shade900, fontWeight: FontWeight.w800),
                   ),
-                ),
-              ],
+                  const SizedBox(
+                    height: 5.0,
+                  ),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      color: Colors.grey[700],
+                      fontSize: 15.0,
+                    ),
+                  ),
+                ],
+              ),
             )
           ],
         ),

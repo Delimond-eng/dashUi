@@ -1,5 +1,9 @@
 import 'package:dashui/global/controllers.dart';
 import 'package:dashui/helpers/navigator.dart';
+import 'package:dashui/responsive/base_widget.dart';
+import 'package:dashui/responsive/enum_screens.dart';
+import 'package:dashui/responsive/sizing_info.dart';
+import 'package:dashui/widgets/expandable_menu_item.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -11,29 +15,41 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final GlobalKey<ScaffoldState> _globalKey = GlobalKey();
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: _customAppBar(),
-      body: LayoutBuilder(
-        builder: (context, boxConstraint) {
-          return Container(
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage("assets/img_2.jpg"),
-                fit: BoxFit.cover,
-                alignment: Alignment.center,
-              ),
-            ),
-            child: Row(
-              children: [
-                _customSidebar(boxConstraint),
-                _customBody(boxConstraint)
-              ],
-            ),
-          );
-        },
-      ),
+    return Responsive(
+      builder: (context, responsiveInfo) {
+        return Scaffold(
+          drawer: responsiveInfo.deviceScreenType == DeviceScreenType.Desktop
+              ? null
+              : const Sidebar(),
+          key: _globalKey,
+          appBar: _customAppBar(responsiveInfo),
+          body: LayoutBuilder(
+            builder: (context, boxConstraint) {
+              return Container(
+                decoration: const BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage("assets/img_2.jpg"),
+                    fit: BoxFit.cover,
+                    alignment: Alignment.center,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    if (responsiveInfo.deviceScreenType ==
+                        DeviceScreenType.Desktop) ...[
+                      _customSidebar(),
+                    ],
+                    _customBody(boxConstraint)
+                  ],
+                ),
+              );
+            },
+          ),
+        );
+      },
     );
   }
 
@@ -50,76 +66,30 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Expanded _customSidebar(BoxConstraints boxConstraint) {
-    return Expanded(
+  Expanded _customSidebar() {
+    return const Expanded(
       flex: 2,
-      child: Container(
-        width: boxConstraint.maxWidth,
-        height: boxConstraint.maxHeight,
-        decoration: BoxDecoration(
-          color: Colors.grey[100].withOpacity(.9),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(15.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              const MenuItem(
-                icon: CupertinoIcons.home,
-                isMainTitle: true,
-                label: "Home",
-              ),
-              MenuItem(
-                label: "Dashboard",
-                color: Colors.blue,
-                onPressed: () {
-                  navigatorController.navigateTo("/");
-                },
-              ),
-              MenuItem(
-                label: "Personal",
-                color: Colors.orange,
-                onPressed: () {
-                  navigatorController.navigateTo("/personal");
-                },
-              ),
-              const MenuItem(
-                icon: Icons.calendar_today_outlined,
-                isMainTitle: true,
-                label: "Calendar",
-              ),
-              MenuItem(
-                label: "Tasks",
-                color: Colors.deepPurple,
-                onPressed: () {},
-              ),
-              MenuItem(
-                label: "Timing plans",
-                color: Colors.blue,
-                onPressed: () {},
-              ),
-            ],
-          ),
-        ),
-      ),
+      child: Sidebar(),
     );
   }
 
-  Widget _customAppBar() {
+  Widget _customAppBar(SizingInfo responsiveInfo) {
     return AppBar(
       backgroundColor: Colors.white,
+      iconTheme: const IconThemeData(color: Colors.black54, size: 18.0),
       elevation: 0,
       title: Row(
         children: [
-          const Icon(
-            Icons.more,
-            color: Colors.black,
-            size: 20.0,
-          ),
-          const SizedBox(
-            width: 10.0,
-          ),
+          if (responsiveInfo.deviceScreenType == DeviceScreenType.Desktop) ...[
+            const Icon(
+              Icons.data_saver_off_rounded,
+              color: Colors.pink,
+              size: 20.0,
+            ),
+            const SizedBox(
+              width: 10.0,
+            ),
+          ],
           Text(
             'Dash Ui',
             style: TextStyle(
@@ -162,15 +132,82 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
+class Sidebar extends StatelessWidget {
+  const Sidebar({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    var screenSize = MediaQuery.of(context).size;
+    return Responsive(
+      builder: (context, responsiveInfo) {
+        return Container(
+          width: responsiveInfo.deviceScreenType == DeviceScreenType.Desktop
+              ? screenSize.width
+              : 250,
+          height: screenSize.height,
+          decoration: BoxDecoration(
+            color: Colors.grey[100].withOpacity(.9),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(15.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                ExpandableMenuItem(
+                  icon: CupertinoIcons.home,
+                  label: "Home",
+                  childs: [
+                    MenuItem(
+                      label: "Dashboard",
+                      color: Colors.blue,
+                      onPressed: () {
+                        navigatorController.navigateTo("/");
+                      },
+                    ),
+                    MenuItem(
+                      label: "Personal",
+                      color: Colors.orange,
+                      onPressed: () {
+                        navigatorController.navigateTo("/personal");
+                      },
+                    ),
+                  ],
+                ),
+                ExpandableMenuItem(
+                  icon: Icons.calendar_today_outlined,
+                  label: "Calendar",
+                  childs: [
+                    MenuItem(
+                      label: "Tasks",
+                      color: Colors.deepPurple,
+                      onPressed: () {},
+                    ),
+                    MenuItem(
+                      label: "Timing plans",
+                      color: Colors.blue,
+                      onPressed: () {},
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
 class MenuItem extends StatelessWidget {
-  final bool isMainTitle;
   final MaterialColor color;
   final IconData icon;
   final String label;
   final Function onPressed;
   const MenuItem({
     Key key,
-    this.isMainTitle = false,
     this.color,
     this.label,
     this.icon,
@@ -181,15 +218,8 @@ class MenuItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 50.0,
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Colors.transparent,
-        border: isMainTitle
-            ? Border(
-                bottom: BorderSide(
-                  color: Colors.grey[200].withOpacity(.7),
-                ),
-              )
-            : null,
       ),
       child: Material(
         color: Colors.transparent,
@@ -198,39 +228,22 @@ class MenuItem extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Row(
-                  children: [
-                    if (isMainTitle) ...[
-                      Icon(
-                        icon,
-                        color: Colors.black,
-                      ),
-                      const SizedBox(
-                        width: 8.0,
-                      ),
-                    ],
-                    Padding(
-                      padding: EdgeInsets.only(left: isMainTitle ? 0 : 15.0),
-                      child: Text(
-                        label,
-                        style: TextStyle(
-                          color: color ?? Colors.black,
-                          fontWeight:
-                              isMainTitle ? FontWeight.w900 : FontWeight.w500,
-                        ),
-                      ),
-                    )
-                  ],
+                Icon(
+                  icon ?? Icons.arrow_right_alt_outlined,
+                  color: color ?? Colors.black,
+                  size: 18.0,
                 ),
-                if (isMainTitle) ...[
-                  const Icon(
-                    Icons.arrow_drop_down,
-                    color: Colors.blue,
+                const SizedBox(
+                  width: 8.0,
+                ),
+                Text(
+                  label,
+                  style: TextStyle(
+                    color: color ?? Colors.black,
+                    fontWeight: FontWeight.w500,
                   ),
-                ]
+                )
               ],
             ),
           ),

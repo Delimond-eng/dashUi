@@ -1,5 +1,7 @@
+import 'package:dashui/helpers/loader.dart';
 import 'package:dashui/responsive/base_widget.dart';
 import 'package:dashui/responsive/enum_screens.dart';
+import 'package:dashui/services/db_helper.dart';
 import 'package:dashui/widgets/custom_page.dart';
 import 'package:dashui/widgets/dash_card.dart';
 import 'package:flutter/cupertino.dart';
@@ -26,6 +28,12 @@ class _DashBoardState extends State<DashBoard> {
   @override
   Widget build(BuildContext context) {
     return CustomPage(
+      withBtn: true,
+      onSyncCallback: () async {
+        showCircularProgress(context, title: 'Synchronisation en cours...');
+        await DbHelper.syncData();
+        Navigator.pop(context);
+      },
       title: "Home | DashBoard",
       child: LayoutBuilder(
         builder: (context, constraint) {

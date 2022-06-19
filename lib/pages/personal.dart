@@ -43,6 +43,12 @@ class _PersonalState extends State<Personal> {
   Widget build(BuildContext context) {
     return CustomPage(
       title: "Home | Personal",
+      withBtn: true,
+      onSyncCallback: () async {
+        var db = await DbHelper.init();
+        var result = await db.query("articles");
+        print(result);
+      },
       child: LayoutBuilder(
         builder: (context, constraint) {
           return Row(

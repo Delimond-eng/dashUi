@@ -16,6 +16,7 @@ dependencies:
   expandable: ^5.0.1
   sqflite_common_ffi: any
   path_provider: any
+  http: any
 
 dev_dependencies:
   flutter_test:

@@ -1,11 +1,13 @@
 // ignore_for_file: deprecated_member_use
 
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:dashui/models/personal.dart';
 import 'package:dashui/services/db_helper.dart';
 import 'package:dashui/widgets/custom_page.dart';
 import 'package:dashui/widgets/input.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class Personal extends StatefulWidget {
@@ -21,6 +23,8 @@ class _PersonalState extends State<Personal> {
   final _formKey = GlobalKey<FormState>();
   List<Personals> personals = [];
 
+  final ScrollController _controller = ScrollController();
+
   @override
   void initState() {
     super.initState();
@@ -29,6 +33,10 @@ class _PersonalState extends State<Personal> {
 
   initData() async {
     var persons = await DbHelper.listPersonals();
+    personals.clear();
+    setState(() {
+      personals.addAll(persons);
+    });
   }
 
   @override
@@ -70,7 +78,7 @@ class _PersonalState extends State<Personal> {
                       Expanded(
                         child: SingleChildScrollView(
                           padding:
-                              const EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 0),
+                              const EdgeInsets.fromLTRB(15.0, 15.0, 15.0, 0),
                           child: Form(
                             key: _formKey,
                             child: Column(
@@ -107,10 +115,16 @@ class _PersonalState extends State<Personal> {
                                     elevation: 10.0,
                                     onPressed: () async {
                                       Personals person = Personals(
-                                        name: "Gaston",
-                                        age: 12,
+                                        name: _txtName.text,
+                                        age: _txtAge.text,
                                       );
-                                      print(person.toMap());
+                                      if (_formKey.currentState.validate()) {
+                                        var id = await DbHelper.insertPersonal(
+                                          person,
+                                        );
+                                        print(id);
+                                        await initData();
+                                      }
                                     },
                                     child: const Text(
                                       "CREATE",
@@ -145,22 +159,32 @@ class _PersonalState extends State<Personal> {
                             style: TextStyle(color: Colors.pink),
                           ),
                         )
-                      : SingleChildScrollView(
-                          padding: const EdgeInsets.all(10.0),
-                          child: Column(
-                            children: personals
-                                .map(
-                                  (data) => Row(
-                                    children: [
-                                      Flexible(
-                                        child: PersonalCard(
-                                          data: data,
+                      : Scrollbar(
+                          controller: _controller,
+                          radius: const Radius.circular(10.0),
+                          isAlwaysShown: true,
+                          child: SingleChildScrollView(
+                            controller: _controller,
+                            padding: const EdgeInsets.all(15.0),
+                            child: Column(
+                              children: personals
+                                  .map(
+                                    (data) => Row(
+                                      children: [
+                                        Flexible(
+                                          child: PersonalCard(
+                                            data: data,
+                                            onDeleted: () async {
+                                              await DbHelper.delete(data.id);
+                                              await initData();
+                                            },
+                                          ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                )
-                                .toList(),
+                                      ],
+                                    ),
+                                  )
+                                  .toList(),
+                            ),
                           ),
                         ),
                 ),
@@ -175,9 +199,11 @@ class _PersonalState extends State<Personal> {
 
 class PersonalCard extends StatelessWidget {
   final Personals data;
+  final Function onDeleted;
   const PersonalCard({
     Key key,
     this.data,
+    this.onDeleted,
   }) : super(key: key);
 
   @override
@@ -196,45 +222,59 @@ class PersonalCard extends StatelessWidget {
           )
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.start,
+      child: Stack(
         children: [
-          const Text(
-            "Personal name",
-            style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w500),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              const Text(
+                "Personal name",
+                style:
+                    TextStyle(color: Colors.grey, fontWeight: FontWeight.w500),
+              ),
+              const SizedBox(
+                height: 5.0,
+              ),
+              Text(
+                "${data.name} ",
+                style: TextStyle(
+                  color: Colors.grey[900],
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              const SizedBox(
+                height: 10.0,
+              ),
+              const Text(
+                "Personal year ago",
+                style: TextStyle(
+                  color: Colors.blue,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(
+                height: 5.0,
+              ),
+              Text(
+                data.age,
+                style: TextStyle(
+                  color: Colors
+                      .primaries[Random().nextInt(Colors.primaries.length)]
+                      .shade900,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(
-            height: 5.0,
-          ),
-          Text(
-            "${data.name} ",
-            style: const TextStyle(
-                color: Colors.grey,
-                fontWeight: FontWeight.w900,
-                fontSize: 18.0),
-          ),
-          const SizedBox(
-            height: 15.0,
-          ),
-          const Text(
-            "Personal year ago",
-            style: TextStyle(
-              color: Colors.blue,
-              fontWeight: FontWeight.w500,
+          Positioned(
+            top: 10.0,
+            right: 10.0,
+            child: IconButton(
+              icon: const Icon(CupertinoIcons.trash, color: Colors.pink),
+              onPressed: onDeleted,
             ),
-          ),
-          const SizedBox(
-            height: 5.0,
-          ),
-          Text(
-            "${data.age}",
-            style: const TextStyle(
-              color: Colors.purple,
-              fontWeight: FontWeight.w900,
-              fontSize: 18.0,
-            ),
-          ),
+          )
         ],
       ),
     );

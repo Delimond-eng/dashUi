@@ -3,14 +3,13 @@ class Personals {
   String name;
   String age;
 
-  Personals({int id, String name, int age});
+  Personals({this.id, this.name, this.age});
 
   Map<String, dynamic> toMap() {
     Map<String, dynamic> data = {};
     if (id != null) {
       data["id"] = id;
     }
-
     data["nom"] = name;
     data["age"] = int.parse(age);
     return data;
@@ -19,6 +18,6 @@ class Personals {
   Personals.fromMap(Map<String, dynamic> data) {
     id = data["id"];
     name = data["nom"];
-    age = data["age"];
+    age = data["age"].toString();
   }
 }

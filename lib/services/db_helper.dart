@@ -6,7 +6,7 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:sqflite_common/sqlite_api.dart';
 
 class DbHelper {
-  static const String DB_NAME = 'testdb.dll';
+  static const String DB_NAME = 'managedb.dll';
   static Future<void> initDbLibrary() async {
     if (Platform.isWindows || Platform.isLinux) {
       sqfliteFfiInit();
@@ -55,12 +55,26 @@ class DbHelper {
     List<Personals> personals = [];
     var result = await db.query('Personals');
 
-    if (result != null) {
-      result.forEach((e) {
-        personals.add(Personals.fromMap(e));
-      });
+    if (result.isNotEmpty) {
+      for (var res in result) {
+        var person = Personals.fromMap(res);
+        personals.add(person);
+      }
+      print("with data :${personals.length}");
       return personals;
+    } else {
+      print("empty data :${personals.length}");
+      return [];
     }
-    return personals;
+  }
+
+  static Future<void> delete(int _id) async {
+    try {
+      var db = await init();
+      var id = await db.rawDelete('DELETE FROM Personals WHERE id = ?', [_id]);
+      print(id);
+    } catch (err) {
+      print(err);
+    }
   }
 }

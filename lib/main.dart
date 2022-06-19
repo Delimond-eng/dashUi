@@ -1,11 +1,14 @@
+import 'package:dashui/services/db_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'controllers/navigator_controller.dart';
 import 'screens/home_screen.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await DbHelper.initDbLibrary();
+  await DbHelper.init();
   Get.put(NavigatorController());
   runApp(const MyApp());
 }

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.14)
-project(dashui LANGUAGES CXX)
+project(dash_ui_sdb LANGUAGES CXX)
 
-set(BINARY_NAME "dashui")
+set(BINARY_NAME "dash_ui_sdb")
 
 cmake_policy(SET CMP0063 NEW)
 

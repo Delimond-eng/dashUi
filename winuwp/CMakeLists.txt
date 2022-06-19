@@ -4,11 +4,11 @@ set(CMAKE_SYSTEM_VERSION 10.0)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED YES)
 
-project(dashui LANGUAGES CXX)
+project(dash_ui_sdb LANGUAGES CXX)
 
 cmake_policy(SET CMP0079 NEW)
 
-set(BINARY_NAME "dashui")
+set(BINARY_NAME "dash_ui_sdb")
 
 # Configure build options.
 get_property(IS_MULTICONFIG GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)

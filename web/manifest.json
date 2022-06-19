@@ -1,6 +1,6 @@
 {
-    "name": "dashui",
-    "short_name": "dashui",
+    "name": "dash_ui_sdb",
+    "short_name": "dash_ui_sdb",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
